@@ -10,7 +10,8 @@ public class JwtService
 
     public string GenerateToken(User user, List<string> permissions)
     {
-        var claims = new List<Claim> { new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()) };
+        var claims = new List<Claim> { new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+        new Claim(ClaimTypes.Name, user.Username) };
         permissions.ForEach(p => claims.Add(new Claim("permissions", p)));
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]!));

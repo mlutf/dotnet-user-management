@@ -1,4 +1,3 @@
-
 public record RoleResponseDto(
     int Id,
     string Name,
@@ -9,3 +8,5 @@ public record RoleListResponseDto(
     int Id,
     string Name
 );
+
+public record RoleCreateResponseDto(int Id);

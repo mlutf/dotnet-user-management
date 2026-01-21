@@ -15,6 +15,35 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<UserRole>().HasKey(x => new { x.UserId, x.RoleId });
         modelBuilder.Entity<RolePrivilege>().HasKey(x => new { x.RoleId, x.PrivilegeId });
 
+        // Configure User-UserRole relationship for cascade delete
+        modelBuilder.Entity<UserRole>()
+            .HasOne(ur => ur.User)
+            .WithMany(u => u.UserRoles)
+            .HasForeignKey(ur => ur.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // Configure Role-UserRole relationship for cascade delete
+        modelBuilder.Entity<UserRole>()
+            .HasOne(ur => ur.Role)
+            .WithMany(r => r.UserRoles)
+            .HasForeignKey(ur => ur.RoleId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // Configure Role-RolePrivilege relationship for cascade delete
+        modelBuilder.Entity<RolePrivilege>()
+            .HasOne(rp => rp.Role)
+            .WithMany(r => r.RolePrivileges)
+            .HasForeignKey(rp => rp.RoleId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // Configure Privilege-RolePrivilege relationship for cascade delete
+        modelBuilder.Entity<RolePrivilege>()
+            .HasOne(rp => rp.Privilege)
+            .WithMany(p => p.RolePrivileges)
+            .HasForeignKey(rp => rp.PrivilegeId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+
         base.OnModelCreating(modelBuilder);
     }
 }

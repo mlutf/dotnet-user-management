@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace UserManagement.Api.Controllers;
@@ -27,4 +28,5 @@ public class AuthController : ControllerBase
 
         return Ok(new { token });
     }
+
 }

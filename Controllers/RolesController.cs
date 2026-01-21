@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using UserManagement.Api.Helpers;
 
 [ApiController]
 [Route("api/roles")]
@@ -12,40 +13,42 @@ public class RolesController : ControllerBase
     [PermissionAuthorize("roles.create")]
     public async Task<IActionResult> Create([FromBody] RoleRequestDto dto)
     {
-        var role = await _service.CreateRole(dto.Name);
-        return Ok(role);
+        var role = await _service.CreateRole(dto);
+        return Ok(new ApiResponse<RoleResponseDto?>(role));
     }
 
     [HttpGet]
     [PermissionAuthorize("roles.list")]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAll([FromQuery] int skip = 0, [FromQuery] int limit = 10)
     {
-        var roles = await _service.GetRoles();
-        return Ok(roles);
+        var (roles, count) = await _service.GetRolesWithPrivileges(skip, limit);
+        return Ok(new ApiListResponse<RoleResponseDto>(roles, count));
     }
 
     [HttpGet("{id}")]
     [PermissionAuthorize("roles.read")]
-    public async Task<IActionResult> Read(int id)
+    public async Task<IActionResult> GetById(int id)
     {
-        var roles = await _service.GetOneById(id);
-        return Ok(roles);
+        var role = await _service.GetRoleByIdWithPrivileges(id);
+        if (role == null) return NotFound();
+        return Ok(new ApiResponse<RoleResponseDto?>(role));
     }
 
     [HttpPut("{id}")]
-    [PermissionAuthorize("users.update")]
+    [PermissionAuthorize("roles.update")]
     public async Task<IActionResult> Update(int id, [FromBody] RoleRequestDto dto)
     {
-        await _service.UpdateRole(id, dto.Name);
-        return Ok();
+        var role = await _service.UpdateRole(id, dto);
+        if (role == null) return NotFound();
+        return Ok(new ApiResponse<RoleResponseDto?>(role));
     }
 
     [HttpDelete("{id}")]
     [PermissionAuthorize("roles.delete")]
     public async Task<IActionResult> Delete(int id)
     {
-        await _service.DeleteRole(id);
-        return Ok();
+        var role = await _service.DeleteRole(id);
+        if (role == null) return NotFound();
+        return Ok(new ApiResponse<RoleResponseDto?>(role));
     }
 }
-

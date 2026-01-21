@@ -1,1 +1,1 @@
-public record RoleRequestDto(string Name);
+public record RoleRequestDto(string Name, List<int> PrivilegeIds);

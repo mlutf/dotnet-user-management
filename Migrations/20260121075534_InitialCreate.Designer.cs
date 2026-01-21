@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace UserManagement.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260121052214_InitialCreate")]
+    [Migration("20260121075534_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -120,7 +120,7 @@ namespace UserManagement.Api.Migrations
             modelBuilder.Entity("RolePrivilege", b =>
                 {
                     b.HasOne("Privilege", "Privilege")
-                        .WithMany()
+                        .WithMany("RolePrivileges")
                         .HasForeignKey("PrivilegeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -153,6 +153,11 @@ namespace UserManagement.Api.Migrations
                     b.Navigation("Role");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Privilege", b =>
+                {
+                    b.Navigation("RolePrivileges");
                 });
 
             modelBuilder.Entity("Role", b =>
