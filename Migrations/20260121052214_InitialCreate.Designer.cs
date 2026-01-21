@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace UserManagement.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260119155911_InitialCreate")]
+    [Migration("20260121052214_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -39,6 +39,9 @@ namespace UserManagement.Api.Migrations
 
                     b.Property<string>("NameSpace")
                         .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Submodule")
                         .HasColumnType("longtext");
 
                     b.HasKey("Id");

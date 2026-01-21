@@ -15,19 +15,24 @@ public static class RolePrivilegeSeeder
             var privileges = new List<Privilege>
             {
                 // User Management
-                new Privilege { NameSpace = "users.create", Module = "Users", Description = "Create new users" },
-                new Privilege { NameSpace = "users.read", Module = "Users", Description = "Read user data" },
-                new Privilege { NameSpace = "users.update", Module = "Users", Description = "Update existing users" },
-                new Privilege { NameSpace = "users.delete", Module = "Users", Description = "Delete users" },
+                new Privilege { NameSpace = "users.create", Module = "Users", Submodule="Create", Description = "Create new users" },
+                new Privilege { NameSpace = "users.list", Module = "Users", Submodule="List", Description = "List users" },
+                new Privilege { NameSpace = "users.read", Module = "Users", Submodule="Read", Description = "Read user data" },
+                new Privilege { NameSpace = "users.update", Module = "Users", Submodule="Update", Description = "Update existing users" },
+                new Privilege { NameSpace = "users.delete", Module = "Users", Submodule="Delete", Description = "Delete users" },
 
                 // Role Management
-                new Privilege { NameSpace = "roles.create", Module = "Roles", Description = "Create new roles" },
-                new Privilege { NameSpace = "roles.read", Module = "Roles", Description = "Read role data" },
-                new Privilege { NameSpace = "roles.update", Module = "Roles", Description = "Update existing roles" },
-                new Privilege { NameSpace = "roles.delete", Module = "Roles", Description = "Delete roles" },
+                new Privilege { NameSpace = "roles.create", Module = "Roles", Submodule="Create", Description = "Create new roles" },
+                new Privilege { NameSpace = "roles.list", Module = "Roles", Submodule="List", Description = "List role data" },
+                new Privilege { NameSpace = "roles.read", Module = "Roles", Submodule="Read", Description = "Read role data" },
+                new Privilege { NameSpace = "roles.update", Module = "Roles", Submodule="Update", Description = "Update existing roles" },
+                new Privilege { NameSpace = "roles.delete", Module = "Roles", Submodule="Delete", Description = "Delete roles" },
+                new Privilege { NameSpace = "roles.create", Module = "Roles", Submodule="Create", Description = "Create new roles" },
 
-                // Privilege Management
-                new Privilege { NameSpace = "privileges.read", Module = "Privileges", Description = "Read privilege data" },
+                new Privilege { NameSpace = "privileges.list", Module = "Privileges", Submodule="List", Description = "List privileges data" },
+                new Privilege { NameSpace = "privileges.read", Module = "Privileges", Submodule="Read", Description = "Read privileges data" },
+                new Privilege { NameSpace = "privileges.update", Module = "Privileges", Submodule="Update", Description = "Update existing privileges" },
+                new Privilege { NameSpace = "privileges.delete", Module = "Privileges", Submodule="Delete", Description = "Delete privileges" },
             };
             context.Privileges.AddRange(privileges);
             context.SaveChanges();
@@ -46,7 +51,6 @@ public static class RolePrivilegeSeeder
             context.SaveChanges();
         }
 
-        // 3. Seed Role-Privilege Mappings
         if (!context.RolePrivileges.Any())
         {
             var allPrivileges = context.Privileges.ToList();
@@ -54,13 +58,11 @@ public static class RolePrivilegeSeeder
             var adminRole = context.Roles.Single(r => r.Name == "Admin");
             var userRole = context.Roles.Single(r => r.Name == "User");
 
-            // SuperAdmin gets all privileges
             foreach (var privilege in allPrivileges)
             {
                 context.RolePrivileges.Add(new RolePrivilege { RoleId = superAdminRole.Id, PrivilegeId = privilege.Id });
             }
 
-            // Admin gets user management privileges
             var adminPrivileges = allPrivileges.Where(p => p.Module == "Users").ToList();
              adminPrivileges.Add(allPrivileges.Single(p=> p.NameSpace == "roles.read"));
             foreach (var privilege in adminPrivileges)
@@ -68,7 +70,6 @@ public static class RolePrivilegeSeeder
                 context.RolePrivileges.Add(new RolePrivilege { RoleId = adminRole.Id, PrivilegeId = privilege.Id });
             }
 
-            // User gets read-only access to users
             var userPrivileges = allPrivileges.Where(p => p.NameSpace == "users.read").ToList();
             foreach (var privilege in userPrivileges)
             {
@@ -78,17 +79,16 @@ public static class RolePrivilegeSeeder
             context.SaveChanges();
         }
 
-        // 4. Seed SuperAdmin User
         if (!context.Users.Any(u => u.Username == "superadmin"))
         {
             var superAdminRole = context.Roles.Single(r => r.Name == "SuperAdmin");
             var superAdminUser = new User
             {
                 Username = "superadmin",
-                Password = PasswordHasher.Hash("password") // Use a secure password in production
+                Password = PasswordHasher.Hash("password")
             };
             context.Users.Add(superAdminUser);
-            context.SaveChanges(); // Save to get the User's Id
+            context.SaveChanges();
 
             context.UserRoles.Add(new UserRole { UserId = superAdminUser.Id, RoleId = superAdminRole.Id });
             context.SaveChanges();
